@@ -1,0 +1,50 @@
+// This source code is subject to the terms of the Mozilla Public License 2.0 at https://mozilla.org/MPL/2.0/
+// © akukiet
+
+
+//@version=4
+strategy(title = "I20 calculation", overlay = true)
+// Inside outside bar detection and take long positions
+
+insidebar = 1
+
+isInside() =>
+    prev = 1
+	previousBar = 2
+	isInsidePattern = high[prev] < high[previousBar] and low[prev] > low[previousBar]
+	
+
+outsidebar = 1
+
+isOutside() =>
+	previousBar = 1
+	isInsidePattern = high >= high[previousBar] and low <= low[previousBar]
+	
+bullbar = 1	
+isbull() =>
+    isbullbarPattern = open < close
+    
+bearbar = 1
+isbear() =>
+    isbearbarPattern = open > close
+    
+x = 50
+y = 150
+ema50 = ema(close, 50)
+ema20 = ema(close,20)	
+
+condition = (isInside() == insidebar )
+
+//plotshape(((isOutside() == outsidebar and isInside() == insidebar) and (isbear() == 1 and ema20 < close)), style=shape.triangleup, location=location.abovebar, color=color.green)
+plotshape(((isOutside() == outsidebar and isInside() == insidebar)), style=shape.triangleup, location=location.abovebar, color=color.green)
+
+//plotshape(((isOutside() == outsidebar and isInside() == insidebar) and (isbull() == 1 and ema20 > close)) , style=shape.triangleup,location=location.belowbar, color=color.red)
+plotshape(((isOutside() == outsidebar and isInside() == insidebar)) , style=shape.triangleup,location=location.belowbar, color=color.red)
+
+longCondition = (((isOutside() == outsidebar and isInside() == insidebar) and ((ema20 < close) and ema20>ema50)))
+exitlongCondition =   (ema50>ema20)
+
+if(longCondition)
+    strategy.entry("LONG", strategy.long)
+if(exitlongCondition)
+    strategy.close("Long")
